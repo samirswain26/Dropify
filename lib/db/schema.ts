@@ -1,7 +1,7 @@
 import { pgTable, uuid, text, integer, boolean, timestamp } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
-export const filesw =  pgTable("files", {
+export const files =  pgTable("files", {
     id: uuid("id").defaultRandom().primaryKey(),
     
     name: text("name").notNull(),
@@ -22,3 +22,19 @@ export const filesw =  pgTable("files", {
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull()
 })
+
+export const fileRelations = relations(files, ({one, many}) => ({
+    // Relationship to parent
+    parent: one(files, {
+        fields: [files.parentId],
+        references: [files.id]
+    }),
+
+    // Relationship to the children
+    child: many(files)
+}))
+
+// Type defination for typescript
+
+export const File = typeof files.$inferSelect
+export const NewFile = typeof files.$inferInsert
