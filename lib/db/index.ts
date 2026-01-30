@@ -8,7 +8,7 @@ if(!databaseurl){
     throw new Error("Database_url is not defined")
 }
 
-const sql = neon(databaseurl)
+const sql = neon(process.env.DATABASE_URL!)
 
 export const db = drizzle(sql, {schema})
 
