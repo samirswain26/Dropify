@@ -1,4 +1,4 @@
-"use-client";
+"use client";
 
 import { useForm } from "react-hook-form";
 import { useSignUp } from "@clerk/nextjs";
@@ -100,5 +100,5 @@ export default function SignUpForm() {
     return <h2>Entering firld for OTP.</h2>;
   }
 
-  return <h1>Signup page with wmail and other things in it.</h1>;
+  return <h1>Signup page with email and other things in it.</h1>;
 }
