@@ -20,16 +20,15 @@ import {
   CheckCircle,
   Eye,
   EyeOff,
-  Link2,
   Loader,
 } from "lucide-react";
 import { Input } from "./ui/input";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "./ui/field";
+import { Field, FieldGroup, FieldLabel } from "./ui/field";
 import { Button } from "./ui/button";
+import Link from "next/link";
 
 //  Custom Schema
 import { signUpSchema } from "@/schemas/signUpSchema";
-import Link from "next/link";
 
 export default function SignUpForm() {
   const { signUp, isLoaded, setActive } = useSignUp();
@@ -143,7 +142,7 @@ export default function SignUpForm() {
           </div>
         )}
 
-        <form onSubmit={() => {handleSubmit}}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <FieldGroup>
             {/* Email */}
             <Field>
