@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircleIcon } from "lucide-react";
+import { AlertCircleIcon, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { Input } from "./ui/input";
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "./ui/field";
 import { Button } from "./ui/button";
@@ -35,6 +35,7 @@ export default function SignUpForm() {
   const [verificationError, setverificationError] = useState<string | null>(
     null,
   );
+  const [ShowPassword, setShowpassword] = useState(false);
 
   const {
     register,
@@ -125,35 +126,56 @@ export default function SignUpForm() {
       <CardContent className="flex flex-col gap-2 text-primary">
         {authError && (
           <div>
-            <Alert variant="destructive" className="max-w-md" >
+            <Alert variant="destructive" className="max-w-md">
               <AlertCircleIcon />
               <AlertTitle>Authentication failed</AlertTitle>
-              <AlertDescription>
-                {authError}
-              </AlertDescription>
+              <AlertDescription>{authError}</AlertDescription>
             </Alert>
           </div>
         )}
-        <Alert ></Alert>
 
         <form onSubmit={() => {}}>
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="fieldgroup-name">
-                Email
-                </FieldLabel>
-              <Input id="fieldgroup-name" placeholder="Enter your email." />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="fieldgroup-email">Pasword</FieldLabel>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+
               <Input
-                id="password"
-                type="password"
-                placeholder="Enter your pasword."
+                id="email"
+                type="email"
+                placeholder="Enter your email."
+                {...register("email")}
               />
             </Field>
+
+            {/* Pasword */}
             <Field>
-              <FieldLabel htmlFor="fieldgroup-email">
+              <FieldLabel htmlFor="password" className="relative">
+                Pasword
+              </FieldLabel>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={ShowPassword ? "text" : "password"}
+                  placeholder="Enter your pasword."
+                  {...register("password")}
+                />
+                <button
+                  onClick={() => setShowpassword(!ShowPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  type="button"
+                >
+                  {ShowPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+            </Field>
+
+            {/* Confirm Password */}
+            <Field>
+              <FieldLabel htmlFor="confirm-password">
                 Confirm Pasword
               </FieldLabel>
               <Input
@@ -162,7 +184,7 @@ export default function SignUpForm() {
                 placeholder="Re-Enter your pasword."
               />
             </Field>
-            <Field orientation="horizontal">
+            <Field orientation="horizontal" className="flex justify-center items-center space-x-15" >
               <Button type="reset" variant="outline">
                 Reset
               </Button>
