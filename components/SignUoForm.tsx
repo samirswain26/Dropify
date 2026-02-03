@@ -6,6 +6,19 @@ import React, { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircleIcon } from "lucide-react";
+import { Input } from "./ui/input";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "./ui/field";
+import { Button } from "./ui/button";
 
 //  Custom Schema
 import { signUpSchema } from "@/schemas/signUpSchema";
@@ -100,5 +113,66 @@ export default function SignUpForm() {
     return <h2>Entering firld for OTP.</h2>;
   }
 
-  return <h1>Signup page with email and other things in it.</h1>;
+  return (
+    <Card className="w-full max-w-md bg-secondary border-4 shadow-2xl bg-default-50">
+      <CardHeader className="flex flex-col items-center gap-1 pb-2">
+        <CardTitle className="text-2xl gap-2">Create Account</CardTitle>
+        <CardDescription className=" text-default-500 text-center">
+          Signup to start and manage your file service securely.
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent className="flex flex-col gap-2 text-primary">
+        {authError && (
+          <div>
+            <Alert variant="destructive" className="max-w-md" >
+              <AlertCircleIcon />
+              <AlertTitle>Authentication failed</AlertTitle>
+              <AlertDescription>
+                {authError}
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
+        <Alert ></Alert>
+
+        <form onSubmit={() => {}}>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="fieldgroup-name">
+                Email
+                </FieldLabel>
+              <Input id="fieldgroup-name" placeholder="Enter your email." />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="fieldgroup-email">Pasword</FieldLabel>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your pasword."
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="fieldgroup-email">
+                Confirm Pasword
+              </FieldLabel>
+              <Input
+                id="confirm-pasword"
+                type="password"
+                placeholder="Re-Enter your pasword."
+              />
+            </Field>
+            <Field orientation="horizontal">
+              <Button type="reset" variant="outline">
+                Reset
+              </Button>
+              <Button type="submit">Submit</Button>
+            </Field>
+          </FieldGroup>
+        </form>
+      </CardContent>
+
+      <CardFooter>{/* <p>------</p> */}</CardFooter>
+    </Card>
+  );
 }

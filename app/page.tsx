@@ -8,7 +8,7 @@ export default function Home() {
     <div>
       <SignUpForm />
       <div className="mt-20" >
-      <Button>Send</Button>
+      {/* <Button>Send</Button> */}
       </div>
     </div>
   )
