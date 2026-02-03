@@ -15,13 +15,21 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircleIcon, Eye, EyeOff, Lock, Mail } from "lucide-react";
+import {
+  AlertCircleIcon,
+  CheckCircle,
+  Eye,
+  EyeOff,
+  Link2,
+  Loader,
+} from "lucide-react";
 import { Input } from "./ui/input";
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "./ui/field";
 import { Button } from "./ui/button";
 
 //  Custom Schema
 import { signUpSchema } from "@/schemas/signUpSchema";
+import Link from "next/link";
 
 export default function SignUpForm() {
   const { signUp, isLoaded, setActive } = useSignUp();
@@ -36,6 +44,7 @@ export default function SignUpForm() {
     null,
   );
   const [ShowPassword, setShowpassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -134,10 +143,13 @@ export default function SignUpForm() {
           </div>
         )}
 
-        <form onSubmit={() => {}}>
+        <form onSubmit={() => {handleSubmit}}>
           <FieldGroup>
+            {/* Email */}
             <Field>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <FieldLabel 
+              htmlFor="email"
+              >Email</FieldLabel>
 
               <Input
                 id="email"
@@ -145,13 +157,16 @@ export default function SignUpForm() {
                 placeholder="Enter your email."
                 {...register("email")}
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.email.message}
+                </p>
+              )}
             </Field>
 
             {/* Pasword */}
             <Field>
-              <FieldLabel htmlFor="password" className="relative">
-                Pasword
-              </FieldLabel>
+              <FieldLabel htmlFor="password">Pasword</FieldLabel>
               <div className="relative">
                 <Input
                   id="password"
@@ -171,6 +186,11 @@ export default function SignUpForm() {
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.password.message}
+                </p>
+              )}
             </Field>
 
             {/* Confirm Password */}
@@ -178,23 +198,71 @@ export default function SignUpForm() {
               <FieldLabel htmlFor="confirm-password">
                 Confirm Pasword
               </FieldLabel>
-              <Input
-                id="confirm-pasword"
-                type="password"
-                placeholder="Re-Enter your pasword."
-              />
+              <div className="relative">
+                <Input
+                  id="confirm-pasword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  {...register("passwordConfirmation")}
+                />
+                <button
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground "
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  type="button"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+              {errors.passwordConfirmation && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.passwordConfirmation.message}
+                </p>
+              )}
             </Field>
-            <Field orientation="horizontal" className="flex justify-center items-center space-x-15" >
-              <Button type="reset" variant="outline">
-                Reset
+
+            {/* Submit Button */}
+            <div className="space-y-40">
+              <div className="flex items-start gap-2">
+                <CheckCircle className="h-5 w-5 mt-0.5 text-primary" />
+                <p className="text-sm">
+                  By signing up, you agree to our Terms of Service and Privacy
+                  Policy
+                </p>
+              </div>
+            </div>
+            <Field className="flex justify-center items-center space-x-15">
+              <Button
+                type="submit"
+                className="btn btn-primary w-full"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader className="h-5 w-5 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  "Sign Up"
+                )}
               </Button>
-              <Button type="submit">Submit</Button>
             </Field>
           </FieldGroup>
         </form>
       </CardContent>
 
-      <CardFooter>{/* <p>------</p> */}</CardFooter>
+      {/* Login */}
+      <CardFooter className="flex items-center">
+        <p className="text-sm flex items-center justify-center-safe">
+          Already have an account?
+        </p>
+        <Link href={"/login"} className=" text-sm ml-1 hover:text-blue-800">
+          Sign Up
+        </Link>
+      </CardFooter>
     </Card>
   );
 }
