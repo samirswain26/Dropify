@@ -191,7 +191,7 @@ export default function SignUpForm() {
                 </p>
               )}
             </Field>
-
+  
             {/* Confirm Password */}
             <Field>
               <FieldLabel htmlFor="confirm-password">
