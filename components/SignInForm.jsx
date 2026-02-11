@@ -4,8 +4,16 @@ import { signInSchema } from "@/schema/signInSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import {useSignIn} from "@clerk/nextjs"
+import {zodResolver} from "@hookform/resolvers"
+import { useRouter } from "next/navigation";
 
-const SignInForm = () => {
+export default function SignInForm () {
+
+  const router = useRouter()
+
+
+
   const {
     register,
     handleSubmit,
@@ -24,4 +32,3 @@ const SignInForm = () => {
   return <div>SignInForm</div>;
 };
 
-export default SignInForm;
