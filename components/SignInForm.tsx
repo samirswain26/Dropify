@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useSignUp } from "@clerk/nextjs";
-import React, { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSignIn } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { z } from "zod";
+import { signInSchema } from "@/schemas/signInSchema";
+
 import {
   Card,
   CardContent,
@@ -14,7 +17,6 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   AlertCircleIcon,
   CheckCircle,
@@ -25,102 +27,58 @@ import {
 import { Input } from "./ui/input";
 import { Field, FieldGroup, FieldLabel } from "./ui/field";
 import { Button } from "./ui/button";
-import Link from "next/link";
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 
-//  Custom Schema
-import { signUpSchema } from "@/schemas/signUpSchema";
-
-export default function SignUpForm() {
-  const { signUp, isLoaded, setActive } = useSignUp();
-
+export default function SignInForm() {
   const router = useRouter();
+  const { signIn, isLoaded, setActive } = useSignIn();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const [verifying, setVerifying] = useState(false);
-  const [isSubmitting, setisSubmitting] = useState(false);
-  const [authError, setauthError] = useState<string | null>(null);
-  const [verificationCode, setverificationCode] = useState("");
-  const [verificationError, setverificationError] = useState<string | null>(
-    null,
-  );
   const [ShowPassword, setShowpassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<z.infer<typeof signUpSchema>>({
-    resolver: zodResolver(signUpSchema),
+  } = useForm<z.infer<typeof signInSchema>>({
+    resolver: zodResolver(signInSchema),
     defaultValues: {
-      email: "",
+      identifier: "",
       password: "",
-      passwordConfirmation: "",
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
-    if (!isLoaded) return;
-    setisSubmitting(true);
-    setauthError(null);
+  const onSubmit = async(data: z.infer<typeof signInSchema> ) => {
+    if(!isLoaded) return null
+
+    setIsSubmitting(true)
+    setAuthError(null)
 
     try {
-      await signUp.create({
-        emailAddress: data.email,
-        password: data.password,
-      });
-      await signUp.prepareEmailAddressVerification({
-        strategy: "email_code",
-      });
-      setVerifying(true);
-    } catch (error: any) {
-      console.error("Signup error : ", error);
-      setauthError(
-        error.errors?.[0]?.message ||
-          "An error occured during the signup process. Please Signup again.",
-      );
-    } finally {
-      setisSubmitting(false);
-    }
-  };
+      const result = await signIn.create({
+        identifier: data.identifier,
+        password: data.password
+      })
 
-  const handleVerificationOnSubmit = async (
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
-    if (!isLoaded || !signUp) return;
-    setisSubmitting(true);
-    setauthError(null);
-
-    try {
-      const result = await signUp.attemptEmailAddressVerification({
-        code: verificationCode,
-      });
-
-      console.log("Result verification is:", result);
-
-      if (result.status === "complete") {
-        await setActive({
-          session: result.createdSessionId,
-        });
-        router.push("/dashboard");
-      } else {
-        console.error("Verification incomplete", result);
-        setverificationError("Verification failed");
+      if(result.status === "complete"){
+        await setActive({session: result.createdSessionId})
+        router.push("/dashboard")
+      }else{
+        console.error("Signin failed", result)
+        setAuthError("Signin not completed")
       }
     } catch (error: any) {
-      console.error("Verification incomplete", error);
-      setverificationError(
-        error.errors?.[0]?.message ||
-          "An error occured during the signup process. Please Signup again.",
-      );
-    } finally {
-      setisSubmitting(false);
+      console.error("Signin error :", error)
+      setAuthError(
+        error.errors?.[0]?.message || "Auth failed in signin."
+      )
+    }finally{
+      setIsSubmitting(false)
     }
-  };
-
-  if (verifying) {
-    return <h2>Entering firld for OTP.</h2>;
   }
+
 
   return (
     <Card className="w-full max-w-md bg-secondary border-4 shadow-2xl bg-default-50">
@@ -146,17 +104,19 @@ export default function SignUpForm() {
           <FieldGroup>
             {/* Email */}
             <Field>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <FieldLabel 
+              htmlFor="email"
+              >Email</FieldLabel>
 
               <Input
-                id="email"
+                id="identifier"
                 type="email"
                 placeholder="Enter your email."
-                {...register("email")}
+                {...register("identifier")}
               />
-              {errors.email && (
+              {errors.identifier && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.email.message}
+                  {errors.identifier.message}
                 </p>
               )}
             </Field>
@@ -190,37 +150,6 @@ export default function SignUpForm() {
               )}
             </Field>
 
-            {/* Confirm Password */}
-            <Field>
-              <FieldLabel htmlFor="confirm-password">
-                Confirm Pasword
-              </FieldLabel>
-              <div className="relative">
-                <Input
-                  id="confirm-pasword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  {...register("passwordConfirmation")}
-                />
-                <button
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground "
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  type="button"
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
-              </div>
-              {errors.passwordConfirmation && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.passwordConfirmation.message}
-                </p>
-              )}
-            </Field>
-
             {/* Submit Button */}
             <div className="space-y-40">
               <div className="flex items-start gap-2">
@@ -243,7 +172,7 @@ export default function SignUpForm() {
                     Loading...
                   </>
                 ) : (
-                  "Sign Up"
+                  "Log In"
                 )}
               </Button>
             </Field>
@@ -261,5 +190,6 @@ export default function SignUpForm() {
         </Link>
       </CardFooter>
     </Card>
+
   );
 }
