@@ -9,7 +9,7 @@ export const files =  pgTable("files", {
     size:text("size").notNull(),
     type: text("type").notNull(), 
 
-    filrUrl: text("file_url").notNull(), // acces url for the file
+    fileUrl: text("file_url").notNull(), // acces url for the file
     thumbnailUrl: text("thumbnail_url"),
 
     userId: text("user_id").notNull(),
