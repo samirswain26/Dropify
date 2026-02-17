@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     const [newFile] = await db.insert(files).values(fileData).returning();
 
-    return NextResponse.json(fileData)
+    return NextResponse.json(newFile)
   } catch (error) {
     return NextResponse.json({error: "Filed to save info in the datbase"}, {status: 500})
   }
